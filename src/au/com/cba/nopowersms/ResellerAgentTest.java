@@ -11,7 +11,7 @@ public class ResellerAgentTest extends AndroidTestCase {
 	final static String ownerPhoneNumberReal = "+61404653790";
 	final static String ownerPhoneNumberTest = "+61404555817";
 	
-	public final void testSettersAndGetters() {
+	public final void test0SettersAndGetters() {
 
 		// Arrange
 		ResellerAgent subject = new ResellerAgent(this.getContext());
@@ -45,16 +45,34 @@ public class ResellerAgentTest extends AndroidTestCase {
 		
 	}
 	
+	// Clear the reseller settings on the phone
+	private void resetPhoneSettings() {
+		ResellerAgent subject = new ResellerAgent(this.getContext());
+		subject.setResellerMessage("");
+		subject.setResellerPhoneNumber("");
+		
+		// This has the effect that next time a reseller message is received, the reseller phone number will 
+		// be set to the sending phone number
+		subject.setResellerMessageCommitted(false);
+	}
+	
 	public final void testChangeResellerMessageCommand() {
 		
 		// Valid command, from valid sender, is accepted
 
 		// Arrange
-		ResellerAgent subject = new ResellerAgent(this.getContext());
+		resetPhoneSettings();
 		
+		ResellerAgent subject = new ResellerAgent(this.getContext());
+		String initialResellerPhoneNumber = subject.getResellerPhoneNumber();
+		
+		Assert.isTrue((initialResellerPhoneNumber == null) ||
+						initialResellerPhoneNumber.equals(""), "ResellerAgent reseller number is null");
 		subject.handleResellerMsgCommand("@", resellerPhoneNumber);
 		Assert.areEqual(subject.getResellerMessage(), "",
 				"Reseller Msg Command precondition");
+		Assert.areEqual(subject.getResellerPhoneNumber(),resellerPhoneNumber,
+							"subject reseller phone number is test reseller phone number");
 
 		// Act
 		String command = "@Happy Christmas!!";
@@ -88,6 +106,10 @@ public class ResellerAgentTest extends AndroidTestCase {
 		final String changeResellerPhoneNumberCommand = "#"+newResellerPhoneNumber;
 		
 		// Arrange
+
+		// Arrange
+		resetPhoneSettings();
+
 		ResellerAgent subject = new ResellerAgent(this.getContext());
 		subject.handleResellerMsgCommand("@", resellerPhoneNumber);
 		Assert.areEqual(subject.getResellerMessage(), "",
