@@ -2,11 +2,12 @@ package au.com.cba.nopowersms;
 
 import android.test.AndroidTestCase;
 import au.com.cba.nopowersms.base.Globals;
+import au.com.cba.nopowersms.database.ContactsAdapter;
 import au.com.cba.nopowersms.database.ResellerAgent;
 
 public class ResellerAgentTest extends AndroidTestCase {
 
-	final static String resellerPhoneNumber = "+1404555817";
+	final static public String resellerPhoneNumber = "+1404555817";
 	final static String newResellerPhoneNumber = "+14447634037";
 	final static String ownerPhoneNumberReal = "+61404653790";
 	final static String ownerPhoneNumberTest = "+61404555817";
@@ -100,6 +101,52 @@ public class ResellerAgentTest extends AndroidTestCase {
 	
 	}
 	
+	public final void testResellerRemoveAndReopen() {
+		
+		// Arrange
+		resetPhoneSettings();
+		
+		ResellerAgent subject = new ResellerAgent(this.getContext());
+
+		// Set initial reseller
+		String command = "@Happy Christmas!!";
+		String sender = resellerPhoneNumber;
+		
+		subject.handleResellerMsgCommand(command,sender);
+	
+		// Assert
+		Assert.areEqual(subject.getResellerMessage(), "Happy Christmas!!",
+				"Reseller Msg Command accepts new msg");
+
+		// Act
+		subject.RemoveFromReseller();
+		
+		// Assert
+
+		Assert.areEqual(subject.getResellerMessage(), "",
+				"After remove from reseller, reseller message is null");
+
+		// Assert
+		// Reseller cannot set msg
+		subject.handleResellerMsgCommand(command,sender);
+		
+		// Assert
+		Assert.areEqual(subject.getResellerMessage(), "",
+				"After remove from reseller, reseller cannot set message");
+
+		// Act
+		// Reopen to reseller
+		subject.reopenToReseller();
+	
+		// Assert
+		subject.handleResellerMsgCommand(command,sender);
+		
+		// Assert
+		Assert.areEqual(subject.getResellerMessage(), "Happy Christmas!!",
+				"After reopen to reseller, reseller can set message");
+
+	}
+	
 	public final void testChangeResellerPhoneCommand() {
 		
 		final String ownerPhoneNumber = Globals.USE_TEST_PHONE_NUMBER ? ownerPhoneNumberTest : ownerPhoneNumberReal;
@@ -136,6 +183,10 @@ public class ResellerAgentTest extends AndroidTestCase {
 		
 		
 
+	}
+
+	protected void tearDown() throws Exception {
+		resetPhoneSettings();
 	}
 
 
