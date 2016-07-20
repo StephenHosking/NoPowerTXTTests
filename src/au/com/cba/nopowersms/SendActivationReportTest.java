@@ -54,19 +54,17 @@ public class SendActivationReportTest extends AndroidTestCase {
 	public final void testSimCardLocking() {
 		// Assemble
 		Context context = getContext();
-		ActivationSettings activationSettings = new ActivationSettings(context);
-		SendActivationReport subject = SendActivationReport
-				.getInstance(context);
+		ActivationSettings subject = new ActivationSettings(context);
 
 		// Assert. SIM is present
-		Assert.isTrue(activationSettings.isSimPresent(),
+		Assert.isTrue(subject.isSimPresent(),
 				"SIM not present reported when it is present");
 
 		// Act - Lock to sim. Current number is valid
-		activationSettings.lockToSim();
+		subject.lockToSim();
 
 		// Assert
-		Assert.isTrue(activationSettings.isSimValid(),
+		Assert.isTrue(subject.isSimValid(),
 				"sim number is not valid, when it is expected to be valid");
 
 		// Act. Change the saved number (because we can't change the actual
@@ -75,21 +73,21 @@ public class SendActivationReportTest extends AndroidTestCase {
 		subject.setTestLockedSimNumber("09876543210987654321");
 
 		// Assert
-		Assert.isFalse(activationSettings.isSimValid(),
+		Assert.isFalse(subject.isSimValid(),
 				"sim number is not valid, when it is expected to be valid");
 
 		// Act. Unlock the SIM
 		subject.unlockSim();
 
 		// Assert
-		Assert.isTrue(activationSettings.isSimValid(),
+		Assert.isTrue(subject.isSimValid(),
 				"sim number is not valid, when it is expected to be valid");
 
 		// Act. Set null SIM number.
 		subject.setTestLockedSimNumber(null);
 
 		// Assert
-		Assert.isTrue(activationSettings.isSimValid(),
+		Assert.isTrue(subject.isSimValid(),
 				"sim number is not valid, when it is expected to be valid");
 
 	}
@@ -100,7 +98,8 @@ public class SendActivationReportTest extends AndroidTestCase {
 		SendActivationReport subject = SendActivationReport
 				.getInstance(context);
 		
-		subject.unlockSim();
+		ActivationSettings activationSettings = new ActivationSettings(context);
+		activationSettings.unlockSim();
 	}
 
 }
